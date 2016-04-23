@@ -257,6 +257,7 @@ public class GenericSong implements SongRep {
 
     @Override
     public void addRepeat(int start, int end, int count) {
+        System.out.println("adding repeat");
         if(start % 4 != 0 || end % 4 != 0) {
             throw new IllegalArgumentException("Repeats must start at the begining or ends of measures");
         }

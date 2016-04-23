@@ -148,8 +148,10 @@ public class ConcreteGuiViewPanel extends JPanel {
     private void paintRepeats(Graphics g) {
         g.setColor(Color.BLACK);
         for (Repeat r : model.getAllRepeats()) {
-            g.drawRect((6 + r.getStart() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4), NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
-            g.drawRect((r.getEnd() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4), NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+            g.drawRect((6 + r.getStart() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4 * BEAT_WIDTH),
+                    NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+            g.drawRect((r.getEnd() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4 * BEAT_WIDTH), NOTE_HEIGHT, 4,
+                    NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
         }
     }
 

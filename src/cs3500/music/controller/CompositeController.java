@@ -20,8 +20,10 @@ public class CompositeController implements IController {
     private final CompositeView view;
     private boolean playing;
     private boolean holdingShift;
+    private boolean holdingR;
     private int lengthOfNextNote; // the next created note will have this length in beats
     private NoteRep selectedNote;
+    private double x;
 
     /**
      * Constructs a composite view with exactly one note in its model
@@ -36,6 +38,7 @@ public class CompositeController implements IController {
         this.view = new CompositeView(model);
         this.playing = true;
         this.holdingShift = false;
+        this.holdingR = false;
         this.lengthOfNextNote = 0;
         setUpKeys();
         setUpMouse();
@@ -116,6 +119,7 @@ public class CompositeController implements IController {
         keyPresses.put(KeyEvent.VK_HOME, new SkipToStart());
         keyPresses.put(KeyEvent.VK_END, new SkipToEnd());
         keyPresses.put(KeyEvent.VK_SHIFT, new HoldShift());
+        keyPresses.put(KeyEvent.VK_R, new HoldR());
         keyPresses.put(KeyEvent.VK_0, new SetNextNoteLength(0));
         keyPresses.put(KeyEvent.VK_1, new SetNextNoteLength(1));
         keyPresses.put(KeyEvent.VK_2, new SetNextNoteLength(2));
@@ -128,6 +132,7 @@ public class CompositeController implements IController {
         keyPresses.put(KeyEvent.VK_9, new SetNextNoteLength(9));
 
         keyReleases.put(KeyEvent.VK_SHIFT, new ReleaseShift());
+        keyReleases.put(KeyEvent.VK_R, new ReleaseR());
 
         KeyboardHandler kh = new KeyboardHandler();
         kh.setKeyPressedMap(keyPresses);
@@ -227,6 +232,24 @@ public class CompositeController implements IController {
     }
 
     /**
+     * Recognize that R has been pressed
+     */
+    class HoldR implements Runnable {
+        public void run() {
+            holdingR = true;
+        }
+    }
+
+    /**
+     * Recognize R has been released
+     */
+    class ReleaseR implements Runnable {
+        public void run() {
+            holdingR = false;
+        }
+    }
+
+    /**
      * Add the given digit to the length of the next note to be added by mouse click
      */
     class SetNextNoteLength implements Runnable {
@@ -282,10 +305,16 @@ public class CompositeController implements IController {
      */
     class NoteDragPress implements Runnable {
         public void run() {
-            Point mouseLoc = view.getMousePosition();
-            boolean noteAtLocation = view.noteAtLocation(mouseLoc);
-            if(noteAtLocation) {
-                selectedNote = view.getNoteAtMouseLocation(mouseLoc);
+            if(!holdingR) {
+                Point mouseLoc = view.getMousePosition();
+                boolean noteAtLocation = view.noteAtLocation(mouseLoc);
+                if (noteAtLocation) {
+                    selectedNote = view.getNoteAtMouseLocation(mouseLoc);
+                }
+            }
+            else {
+                Point mouseLoc = view.getMousePosition();
+                x = view.getNoteAtMouseLocation(mouseLoc).getStart();
             }
         }
     }
@@ -295,20 +324,28 @@ public class CompositeController implements IController {
      */
     class NoteDragRelease implements Runnable {
         public void run() {
-            Point mouseLoc = view.getMousePosition();
-            NoteRep temp = view.getNoteAtMouseLocation(mouseLoc);
+            if(!holdingR) {
+                Point mouseLoc = view.getMousePosition();
+                NoteRep temp = view.getNoteAtMouseLocation(mouseLoc);
 
-            if(selectedNote != null) {
-                Note n = new Note(temp.getStart(), selectedNote.getDuration(), temp.getOctave(),
-                        temp.getPitch(), selectedNote.getInstrument(), selectedNote.getVolume());
-                try {
-                    model.addNote(n);
-                    model.removeNote(selectedNote);
-                } catch(IllegalArgumentException e) {
-                    e.printStackTrace();
+                if(selectedNote != null) {
+                    Note n = new Note(temp.getStart(), selectedNote.getDuration(), temp.getOctave(),
+                            temp.getPitch(), selectedNote.getInstrument(), selectedNote.getVolume());
+                    try {
+                        model.addNote(n);
+                        model.removeNote(selectedNote);
+                    } catch(IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                    selectedNote = null;
                 }
-                selectedNote = null;
             }
+            else {
+                Point mouseLoc = view.getMousePosition();
+                double x2 = view.getNoteAtMouseLocation(mouseLoc).getStart();
+                model.addRepeat((int)x, (int)x2, 1);
+            }
+
         }
     }
 }
