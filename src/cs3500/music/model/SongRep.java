@@ -102,4 +102,17 @@ public interface SongRep {
      * @return the tempo of this song
      */
     int getTempo();
+
+    /**
+     * Adds a repeat to the song, which will set a section of the song to be played more than once
+     *
+     * @param start the beginning of the repeated section
+     * @param end the end of the repeated section / when to repeat
+     */
+    void addRepeat(int start, int end, int count);
+
+    /**
+     * Resets all the repeats in the song so they look like they were never repeated
+     */
+    void resetRepeats();
 }

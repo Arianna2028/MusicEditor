@@ -12,10 +12,11 @@ public class GenericSong implements SongRep {
     public static final class Builder implements CompositionBuilder<GenericSong> {
         private int tempo;
         private List<NoteRep> notes = new ArrayList<>();
+        private List<Repeat> repeats = new ArrayList<>();
 
         @Override
         public GenericSong build() {
-            return new GenericSong(this.notes, this.tempo);
+            return new GenericSong(this.notes, this.tempo, this.repeats);
         }
 
         @Override
@@ -35,16 +36,36 @@ public class GenericSong implements SongRep {
             notes.add(note);
             return this;
         }
+
+        @Override
+        public CompositionBuilder<GenericSong> addRepeat(int start, int end, int count) {
+            if (repeats.size() == 0) {
+                repeats.add(new Repeat(start, end, count));
+            } else {
+                for (Repeat r : repeats) {
+
+                    if ((r.getStart() < start && r.getEnd() > end) ||
+                            (r.getStart() > start && r.getEnd() < end)) {
+                        repeats.add(new Repeat(start, end, count));
+                    } else {
+                        throw new IllegalArgumentException("That is an invalid repeat");
+                    }
+                }
+            }
+            return this;
+        }
     }
 
     private int tempo; // in microseconds per beat
     private int currentBeat;
     private List<NoteRep> notes;
+    private List<Repeat> repeats;
 
     /** Public default constructor */
     public GenericSong() {
         this.currentBeat = 0;
         this.notes = new ArrayList<>();
+        this.repeats = new ArrayList<>();
     }
 
     /** Constructor for a pre-made song */
@@ -56,6 +77,19 @@ public class GenericSong implements SongRep {
         this.tempo = tempo;
         this.currentBeat = 0;
         this.notes = notes;
+        this.repeats = new ArrayList<>();
+    }
+
+    public GenericSong(List<NoteRep> notes, int tempo, List<Repeat> repeats) {
+        Objects.requireNonNull(notes);
+        Objects.requireNonNull(repeats);
+        if (tempo < 0) {
+            throw new IllegalArgumentException("Tempo must be positive");
+        }
+        this.tempo = tempo;
+        this.currentBeat = 0;
+        this.notes = notes;
+        this.repeats = repeats;
     }
 
     @Override
@@ -165,6 +199,21 @@ public class GenericSong implements SongRep {
             throw new IllegalArgumentException("Current beat must be positive");
         }
         this.currentBeat = set;
+        for(Repeat r : repeats) {
+            if(r.getEnd() == currentBeat) {
+                if(r.getCount() > 0) {
+                    r.decreaseRepeats();
+                    setCurrentBeat(r.getStart());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void resetRepeats() {
+        for (Repeat r : repeats) {
+            r.resetCount();
+        }
     }
 
     @Override
@@ -198,6 +247,20 @@ public class GenericSong implements SongRep {
     @Override
     public int getTempo() {
         return tempo;
+    }
+
+    @Override
+    public void addRepeat(int start, int end, int count) {
+        for(Repeat r : repeats) {
+
+            if((r.getStart() < start && r.getEnd() > end) ||
+                    (r.getStart() > start && r.getEnd() < end) ) {
+                repeats.add(new Repeat(start, end, count));
+            }
+            else {
+                throw new IllegalArgumentException("That is an invalid repeat");
+            }
+        }
     }
 
     /**

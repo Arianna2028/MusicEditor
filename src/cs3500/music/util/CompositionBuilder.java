@@ -1,5 +1,7 @@
 package cs3500.music.util;
 
+import cs3500.music.model.GenericSong;
+
 /**
  * A builder of compositions.  Since we do not know in advance what
  * the name of the main type is for a model, we parameterize this builder interface
@@ -32,4 +34,14 @@ public interface CompositionBuilder<T> {
      * @return
      */
     CompositionBuilder<T> addNote(int start, int end, int instrument, int pitch, int volume);
+
+    /**
+     * Adds a new repeat to the piece
+     * @param start the start of the repeat
+     * @param end the end of the repeat
+     * @param count The length of the repeat
+     * @return Returns the song
+     */
+    CompositionBuilder<T> addRepeat(int start, int end, int count);
+
 }
