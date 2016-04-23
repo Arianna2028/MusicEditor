@@ -42,6 +42,9 @@ public class GenericSong implements SongRep {
             if(start % 4 != 0 || end % 4 != 0) {
                 throw new IllegalArgumentException("Repeats must start at the begining or ends of measures");
             }
+            if(count <= 0) {
+                throw new IllegalArgumentException("Repeats must repeat at least once");
+            }
             for(Repeat r : repeats) {
 
                 if(!(r.getStart() < start && r.getEnd() < end) ||
@@ -256,6 +259,9 @@ public class GenericSong implements SongRep {
     public void addRepeat(int start, int end, int count) {
         if(start % 4 != 0 || end % 4 != 0) {
             throw new IllegalArgumentException("Repeats must start at the begining or ends of measures");
+        }
+        if(count <= 0) {
+            throw new IllegalArgumentException("Repeats must repeat at least once");
         }
         for(Repeat r : repeats) {
 
