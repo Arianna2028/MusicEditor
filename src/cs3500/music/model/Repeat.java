@@ -3,7 +3,7 @@ package cs3500.music.model;
 /**
  * Represents a section of a SongRep that should be repeated.
  */
-public class Repeat {
+public final class Repeat {
     private int startBeat;
     private int endBeat;
     private int repeatCount;

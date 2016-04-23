@@ -39,19 +39,19 @@ public class GenericSong implements SongRep {
 
         @Override
         public CompositionBuilder<GenericSong> addRepeat(int start, int end, int count) {
-            if (repeats.size() == 0) {
-                repeats.add(new Repeat(start, end, count));
-            } else {
-                for (Repeat r : repeats) {
-
-                    if ((r.getStart() < start && r.getEnd() > end) ||
-                            (r.getStart() > start && r.getEnd() < end)) {
-                        repeats.add(new Repeat(start, end, count));
-                    } else {
-                        throw new IllegalArgumentException("That is an invalid repeat");
-                    }
-                }
-            }
+//            if (repeats.size() == 0) {
+//                repeats.add(new Repeat(start, end, count));
+//            } else {
+//                for (Repeat r : repeats) {
+//                    if ((r.getStart() < start && r.getEnd() < end) ||
+//                            (r.getStart() > start && r.getEnd() > end)) {
+//                        repeats.add(new Repeat(start, end, count));
+//                    } else {
+//                        throw new IllegalArgumentException("That is an invalid repeat");
+//                    }
+//                }
+//            }
+            repeats.add(new Repeat(start, end, count));
             return this;
         }
     }
@@ -214,6 +214,11 @@ public class GenericSong implements SongRep {
         for (Repeat r : repeats) {
             r.resetCount();
         }
+    }
+
+    @Override
+    public List<Repeat> getAllRepeats() {
+        return Collections.unmodifiableList(repeats);
     }
 
     @Override

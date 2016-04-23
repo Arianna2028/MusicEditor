@@ -115,4 +115,10 @@ public interface SongRep {
      * Resets all the repeats in the song so they look like they were never repeated
      */
     void resetRepeats();
+
+    /**
+     *
+     * @return the list of all repeats in this song
+     */
+    List<Repeat> getAllRepeats();
 }
