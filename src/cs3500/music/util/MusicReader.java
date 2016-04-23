@@ -52,6 +52,18 @@ public class MusicReader {
                                 + scanner.nextLine());
                     }
                     break;
+                case "repeat":
+                    try {
+                        int start = scanner.nextInt();
+                        int end = scanner.nextInt();
+                        int count = scanner.nextInt();
+                        piece.addRepeat(start, end, count);
+                    }
+                    catch (NoSuchElementException e) {
+                        throw new IllegalArgumentException("Malformed repeat line: "
+                                + scanner.nextLine());
+                    }
+                    break;
                 default:
                     throw new IllegalArgumentException("Bad line type: " + lineType);
             }

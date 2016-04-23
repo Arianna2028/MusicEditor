@@ -199,7 +199,10 @@ public class CompositeController implements IController {
      * Jump the current beat and the view to the beginning of the song
      */
     class SkipToStart implements Runnable {
-        public void run() { jumpTo(0); }
+        public void run() {
+            jumpTo(0);
+            model.resetRepeats();
+        }
     }
 
     /**

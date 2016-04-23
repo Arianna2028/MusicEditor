@@ -48,6 +48,7 @@ public class ConcreteGuiViewPanel extends JPanel {
         paintNoteLabels(g);
         paintMeasures(g);
         paintRedLine(g);
+        paintRepeats(g);
     }
 
     /**
@@ -141,6 +142,14 @@ public class ConcreteGuiViewPanel extends JPanel {
         int cbx = currentBeatX();
         if ((model.getBeat() + 1) - xWinStart * 4 > 0) { // don't draw when not in view
             g.drawLine(cbx, NOTE_HEIGHT, cbx, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+        }
+    }
+
+    private void paintRepeats(Graphics g) {
+        g.setColor(Color.BLACK);
+        for (Repeat r : model.getAllRepeats()) {
+            g.drawRect((6 + r.getStart() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4), NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+            g.drawRect((r.getEnd() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4), NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
         }
     }
 
