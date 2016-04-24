@@ -11,6 +11,16 @@ import static org.junit.Assert.assertArrayEquals;
 
 /** Tests for the {@link GenericSong} class */
 public class GenericSongTest {
+    @Test
+    public void testAddRepeat() {
+        SongRep gs = new GenericSong();
+        assertEquals(0, gs.getAllRepeats().size());
+        gs.addRepeat(8, 12, 1);
+        assertEquals(1, gs.getAllRepeats().size());
+        gs.addRepeat(4, 16, 3);
+        assertEquals(2, gs.getAllRepeats().size());
+    }
+
     @Test (expected = NullPointerException.class)
     public void testConstructorNotesNonNull() {
         new GenericSong(null, 0);

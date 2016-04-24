@@ -197,11 +197,13 @@ public class GenericSong implements SongRep {
         if (set < 0) {
             throw new IllegalArgumentException("Current beat must be positive");
         }
+
         this.currentBeat = set;
         for (Repeat r : repeats) {
             if (r.getEnd() == currentBeat) {
                 if (r.getCount() > 0) {
                     r.decreaseRepeats();
+                    resetRepeatsInside(r.getStart(), r.getEnd());
                     setCurrentBeat(r.getStart());
                 }
             }
@@ -254,12 +256,23 @@ public class GenericSong implements SongRep {
     @Override
     public void addRepeat(int start, int end, int count) {
         for (Repeat r : repeats) {
-            if (!(r.getStart() < start && r.getEnd() < end) ||
-                    !(r.getStart() < start && r.getEnd() < end)) {
+            if (!((start < r.getStart() && end > r.getEnd()) ||
+                    (start > r.getStart() && end < r.getEnd()))) {
                 throw new IllegalArgumentException("That is an invalid repeat");
             }
         }
         repeats.add(new Repeat(start, end, count));
+    }
+
+    @Override
+    public int getLength() {
+        int out = 0;
+
+        for (NoteRep n : notes) {
+            int end = n.getEnd();
+            out = end > out ? end : out;
+        }
+        return out;
     }
 
     /**
@@ -321,14 +334,11 @@ public class GenericSong implements SongRep {
         return highestNote;
     }
 
-    @Override
-    public int getLength() {
-        int out = 0;
-
-        for (NoteRep n : notes) {
-            int end = n.getEnd();
-            out = end > out ? end : out;
+    private void resetRepeatsInside(int start, int end) {
+        for (Repeat r : repeats) {
+            if (r.getStart() > start && r.getEnd() < end) {
+                r.resetCount();
+            }
         }
-        return out;
     }
 }
