@@ -15,10 +15,26 @@ public class GenericSongTest {
     public void testAddRepeat() {
         SongRep gs = new GenericSong();
         assertEquals(0, gs.getAllRepeats().size());
-        gs.addRepeat(8, 12, 1);
+        gs.addRepeat(12, 24, 1);
         assertEquals(1, gs.getAllRepeats().size());
-        gs.addRepeat(4, 16, 3);
+        gs.addRepeat(8, 28, 3);
         assertEquals(2, gs.getAllRepeats().size());
+        gs.addRepeat(32, 40, 2);
+        assertEquals(3, gs.getAllRepeats().size());
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testAddRepeatInvalid1() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(8, 28, 3);
+        gs.addRepeat(4, 16, 3);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testAddRepeatInvalid2() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(8, 28, 3);
+        gs.addRepeat(12, 32, 3);
     }
 
     @Test (expected = NullPointerException.class)

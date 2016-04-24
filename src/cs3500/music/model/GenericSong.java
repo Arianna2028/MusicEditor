@@ -199,15 +199,12 @@ public class GenericSong implements SongRep {
         }
 
         this.currentBeat = set;
-        for (Repeat r : repeats) {
-            if (r.getEnd() == currentBeat) {
-                if (r.getCount() > 0) {
+        repeats.stream().filter(r -> r.getEnd() == currentBeat).filter(r -> r.getCount() > 0).
+                forEach(r -> {
                     r.decreaseRepeats();
                     resetRepeatsInside(r.getStart(), r.getEnd());
                     setCurrentBeat(r.getStart());
-                }
-            }
-        }
+                });
     }
 
     @Override
@@ -256,8 +253,14 @@ public class GenericSong implements SongRep {
     @Override
     public void addRepeat(int start, int end, int count) {
         for (Repeat r : repeats) {
-            if (!((start < r.getStart() && end > r.getEnd()) ||
-                    (start > r.getStart() && end < r.getEnd()))) {
+            int s = r.getStart();
+            int e = r.getEnd();
+            boolean nestedOut = start < s && end > e;
+            boolean nestedIn = start > s && end < e;
+            boolean noConflictLeft = start < s && end < s;
+            boolean noConflictRight = start > e && end > e;
+
+            if (!(nestedOut || nestedIn) && !(noConflictLeft || noConflictRight)) {
                 throw new IllegalArgumentException("That is an invalid repeat");
             }
         }
@@ -335,10 +338,7 @@ public class GenericSong implements SongRep {
     }
 
     private void resetRepeatsInside(int start, int end) {
-        for (Repeat r : repeats) {
-            if (r.getStart() > start && r.getEnd() < end) {
-                r.resetCount();
-            }
-        }
+        repeats.stream().filter(r -> r.getStart() > start && r.getEnd() < end).
+                forEach(Repeat::resetCount);
     }
 }
