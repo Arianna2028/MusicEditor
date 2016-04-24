@@ -12,8 +12,8 @@ public final class Repeat {
     /**
      * @throws IllegalAccessException you should never use this constructor
      */
-    public Repeat() throws IllegalAccessException {
-        throw new IllegalAccessException("Please don't do this");
+    public Repeat() {
+        throw new IllegalArgumentException("Please don't do this");
     }
 
     /**
@@ -22,6 +22,27 @@ public final class Repeat {
      * @param count the amount of times this section should be repeated
      */
     public Repeat(int start, int end, int count) {
+        if (start < 0 || end < 0 || count < 0) {
+            throw new IllegalArgumentException("Repeat cannot take negative values");
+        }
+
+        if (Math.abs(start - end) < 1) {
+            throw new IllegalArgumentException("Repeats must span at least one beat");
+        }
+
+        if (start > end) {
+            throw new IllegalArgumentException("Start must come before end");
+        }
+
+        if (start % 4 != 0 || end % 4 != 0) {
+            throw new IllegalArgumentException("Repeats must start at the beginning or " +
+                    "end of a measure");
+        }
+
+        if (count <= 0) {
+            throw new IllegalArgumentException("Repeats must repeat at least once");
+        }
+
         this.startBeat = start;
         this.endBeat = end;
         this.repeatCount = count;
@@ -43,7 +64,6 @@ public final class Repeat {
     }
 
     /**
-     *
      * @return the remaining repeats left on this repeat
      */
     public int getCount() {
@@ -57,6 +77,9 @@ public final class Repeat {
         this.repeatCount = Math.max(0, repeatCount - 1);
     }
 
+    /**
+     * Resets the repeats to their original state (as if they had not been played)
+     */
     public void resetCount() {
         this.repeatCount = this.initialRepeats;
     }

@@ -24,7 +24,6 @@ public class GuiViewFrame extends JFrame implements GuiView {
     }
 
     /**
-     *
      * @param model - the model that the view takes in
      */
     public GuiViewFrame(SongRep model) {
@@ -43,7 +42,7 @@ public class GuiViewFrame extends JFrame implements GuiView {
     }
 
     @Override
-    public Dimension getPreferredSize(){
+    public Dimension getPreferredSize() {
         return displayPanel.getPreferredSize();
     }
 
@@ -62,7 +61,7 @@ public class GuiViewFrame extends JFrame implements GuiView {
     @Override
     public void scrollLeft() {
         displayPanel.scrollLeft();
-            repaint();
+        repaint();
     }
 
     @Override
