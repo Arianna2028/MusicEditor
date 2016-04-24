@@ -37,6 +37,37 @@ public class GenericSongTest {
         gs.addRepeat(12, 32, 3);
     }
 
+    @Test
+    public void testGetAllRepeats() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(0, 4, 2);
+        assertEquals(1, gs.getAllRepeats().size());
+        gs.addRepeat(8, 12, 1);
+        assertEquals(2, gs.getAllRepeats().size());
+    }
+
+    @Test (expected = UnsupportedOperationException.class)
+    public void testGetAllRepeatsUnmodifiable() {
+        SongRep gs = new GenericSong();
+        gs.getAllRepeats().add(new Repeat(4, 8, 1));
+    }
+
+    @Test
+    public void testResetRepeats() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(0, 4, 2);
+        gs.addRepeat(8, 12, 1);
+        gs.setCurrentBeat(4);
+        gs.getAllRepeats().get(0).decreaseRepeats();
+        gs.getAllRepeats().get(0).decreaseRepeats();
+        gs.getAllRepeats().get(1).decreaseRepeats();
+        assertEquals(0, gs.getAllRepeats().get(0).getCount());
+        assertEquals(0, gs.getAllRepeats().get(1).getCount());
+        gs.resetRepeats();
+        assertEquals(2, gs.getAllRepeats().get(0).getCount());
+        assertEquals(1, gs.getAllRepeats().get(1).getCount());
+    }
+
     @Test (expected = NullPointerException.class)
     public void testConstructorNotesNonNull() {
         new GenericSong(null, 0);
