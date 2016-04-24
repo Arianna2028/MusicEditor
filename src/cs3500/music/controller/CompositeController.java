@@ -266,6 +266,7 @@ public class CompositeController implements IController {
      * Add the given digit to the length of the next note to be added by mouse click
      */
     class SetNextNoteLength implements Runnable {
+
         private int numberPressed;
 
         SetNextNoteLength(int num) {
@@ -273,8 +274,8 @@ public class CompositeController implements IController {
         }
 
         public void run() {
-            lengthOfNextNote = Integer.valueOf(Integer.toString(lengthOfNextNote)
-                    + Integer.toString(numberPressed));
+                lengthOfNextNote = Integer.valueOf(Integer.toString(lengthOfNextNote)
+                        + Integer.toString(numberPressed));
         }
     }
 
@@ -356,7 +357,7 @@ public class CompositeController implements IController {
             } else {
                 Point mouseLoc = view.getMousePosition();
                 double x2 = view.getNoteAtMouseLocation(mouseLoc).getStart();
-                model.addRepeat((int) x, (int) x2, 1);
+                model.addRepeat((int) x, (int) x2, lengthOfNextNote);
             }
 
         }
