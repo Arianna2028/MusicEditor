@@ -40,9 +40,14 @@ public class GenericSong implements SongRep {
         @Override
         public CompositionBuilder<GenericSong> addRepeat(int start, int end, int count) {
             for (Repeat r : repeats) {
+                int s = r.getStart();
+                int e = r.getEnd();
+                boolean nestedOut = start < s && end > e;
+                boolean nestedIn = start > s && end < e;
+                boolean noConflictLeft = start < s && end < s;
+                boolean noConflictRight = start > e && end > e;
 
-                if (!(r.getStart() < start && r.getEnd() < end) ||
-                        !(r.getStart() < start && r.getEnd() < end)) {
+                if (!(nestedOut || nestedIn) && !(noConflictLeft || noConflictRight)) {
                     throw new IllegalArgumentException("That is an invalid repeat");
                 }
             }
