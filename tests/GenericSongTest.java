@@ -11,6 +11,63 @@ import static org.junit.Assert.assertArrayEquals;
 
 /** Tests for the {@link GenericSong} class */
 public class GenericSongTest {
+    @Test
+    public void testAddRepeat() {
+        SongRep gs = new GenericSong();
+        assertEquals(0, gs.getAllRepeats().size());
+        gs.addRepeat(12, 24, 1);
+        assertEquals(1, gs.getAllRepeats().size());
+        gs.addRepeat(8, 28, 3);
+        assertEquals(2, gs.getAllRepeats().size());
+        gs.addRepeat(32, 40, 2);
+        assertEquals(3, gs.getAllRepeats().size());
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testAddRepeatInvalid1() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(8, 28, 3);
+        gs.addRepeat(4, 16, 3);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testAddRepeatInvalid2() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(8, 28, 3);
+        gs.addRepeat(12, 32, 3);
+    }
+
+    @Test
+    public void testGetAllRepeats() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(0, 4, 2);
+        assertEquals(1, gs.getAllRepeats().size());
+        gs.addRepeat(8, 12, 1);
+        assertEquals(2, gs.getAllRepeats().size());
+    }
+
+    @Test (expected = UnsupportedOperationException.class)
+    public void testGetAllRepeatsUnmodifiable() {
+        SongRep gs = new GenericSong();
+        gs.getAllRepeats().add(new Repeat(4, 8, 1));
+    }
+
+    @Test
+    public void testResetRepeats() {
+        SongRep gs = new GenericSong();
+        gs.addRepeat(0, 4, 2);
+        gs.addRepeat(8, 12, 1);
+        gs.setCurrentBeat(4);
+        gs.getAllRepeats().get(0).decreaseRepeats();
+        gs.getAllRepeats().get(0).decreaseRepeats();
+        gs.getAllRepeats().get(1).decreaseRepeats();
+        assertEquals(0, gs.getAllRepeats().get(0).getCount());
+        assertEquals(0, gs.getAllRepeats().get(1).getCount());
+        gs.resetRepeats();
+        assertEquals(2, gs.getAllRepeats().get(0).getCount());
+        assertEquals(1, gs.getAllRepeats().get(1).getCount());
+    }
+
     @Test (expected = NullPointerException.class)
     public void testConstructorNotesNonNull() {
         new GenericSong(null, 0);

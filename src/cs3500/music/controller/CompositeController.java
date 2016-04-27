@@ -32,7 +32,9 @@ public class CompositeController implements IController {
         throw new IllegalArgumentException("You must instantiate your controller properly");
     }
 
-    /** Create a controller and initialize its view to use the given model */
+    /**
+     * Create a controller and initialize its view to use the given model
+     */
     public CompositeController(SongRep model) {
         this.model = model;
         this.view = new CompositeView(model);
@@ -67,7 +69,7 @@ public class CompositeController implements IController {
                 time.setInitialDelay(0);
                 time.start();
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -97,6 +99,7 @@ public class CompositeController implements IController {
 
     /**
      * Jumps the current beat of the model and view to the given beat
+     *
      * @param beat the beat to jump to
      */
     private void jumpTo(int beat) {
@@ -140,7 +143,9 @@ public class CompositeController implements IController {
         view.addKeyListener(kh);
     }
 
-    /** Add all desired functionality for mouse interaction */
+    /**
+     * Add all desired functionality for mouse interaction
+     */
     private void setUpMouse() {
         MouseHandler mh = new MouseHandler();
         mh.setClickEvent(MouseEvent.BUTTON1, new NoteGod());
@@ -171,7 +176,9 @@ public class CompositeController implements IController {
      * Scroll the view down
      */
     class ScrollDown implements Runnable {
-        public void run() { view.scrollDown(); }
+        public void run() {
+            view.scrollDown();
+        }
     }
 
     /**
@@ -214,21 +221,27 @@ public class CompositeController implements IController {
      * Jump the current beat and the view to the end of the song
      */
     class SkipToEnd implements Runnable {
-        public void run() { jumpTo(model.getLength()); }
+        public void run() {
+            jumpTo(model.getLength());
+        }
     }
 
     /**
      * Recognize that shift is being held down
      */
     class HoldShift implements Runnable {
-        public void run() { holdingShift = true; }
+        public void run() {
+            holdingShift = true;
+        }
     }
 
     /**
      * Recognize that shift has been released
      */
     class ReleaseShift implements Runnable {
-        public void run() { holdingShift = false; }
+        public void run() {
+            holdingShift = false;
+        }
     }
 
     /**
@@ -253,12 +266,16 @@ public class CompositeController implements IController {
      * Add the given digit to the length of the next note to be added by mouse click
      */
     class SetNextNoteLength implements Runnable {
+
         private int numberPressed;
-        SetNextNoteLength(int num) { this.numberPressed = num; }
+
+        SetNextNoteLength(int num) {
+            this.numberPressed = num;
+        }
 
         public void run() {
-            lengthOfNextNote = Integer.valueOf(Integer.toString(lengthOfNextNote)
-                    + Integer.toString(numberPressed));
+                lengthOfNextNote = Integer.valueOf(Integer.toString(lengthOfNextNote)
+                        + Integer.toString(numberPressed));
         }
     }
 
@@ -280,12 +297,11 @@ public class CompositeController implements IController {
 
         public void run() {
             Point mouseLoc;
-            if(test) {
+            if (test) {
                 mouseLoc = givenMouseLoc;
-            }
-            else {
+            } else {
                 mouseLoc = view.getMousePosition();
-                }
+            }
             boolean noteAtLocation = view.noteAtLocation(mouseLoc);
 
             NoteRep temp = view.getNoteAtMouseLocation(mouseLoc);
@@ -305,14 +321,13 @@ public class CompositeController implements IController {
      */
     class NoteDragPress implements Runnable {
         public void run() {
-            if(!holdingR) {
+            if (!holdingR) {
                 Point mouseLoc = view.getMousePosition();
                 boolean noteAtLocation = view.noteAtLocation(mouseLoc);
                 if (noteAtLocation) {
                     selectedNote = view.getNoteAtMouseLocation(mouseLoc);
                 }
-            }
-            else {
+            } else {
                 Point mouseLoc = view.getMousePosition();
                 x = view.getNoteAtMouseLocation(mouseLoc).getStart();
             }
@@ -324,26 +339,25 @@ public class CompositeController implements IController {
      */
     class NoteDragRelease implements Runnable {
         public void run() {
-            if(!holdingR) {
+            if (!holdingR) {
                 Point mouseLoc = view.getMousePosition();
                 NoteRep temp = view.getNoteAtMouseLocation(mouseLoc);
 
-                if(selectedNote != null) {
+                if (selectedNote != null) {
                     Note n = new Note(temp.getStart(), selectedNote.getDuration(), temp.getOctave(),
                             temp.getPitch(), selectedNote.getInstrument(), selectedNote.getVolume());
                     try {
                         model.addNote(n);
                         model.removeNote(selectedNote);
-                    } catch(IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
                     selectedNote = null;
                 }
-            }
-            else {
+            } else {
                 Point mouseLoc = view.getMousePosition();
                 double x2 = view.getNoteAtMouseLocation(mouseLoc).getStart();
-                model.addRepeat((int)x, (int)x2, 1);
+                model.addRepeat((int) x, (int) x2, lengthOfNextNote);
             }
 
         }

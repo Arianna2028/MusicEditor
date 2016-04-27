@@ -32,23 +32,22 @@ public class GenericSong implements SongRep {
             int octave = (pitch / 12) - 1;
             Pitch p = Pitch.values()[pitch - (octave + 1) * 12];
 
-            NoteRep note = new Note(start, end-start, octave, p, instrument, volume);
+            NoteRep note = new Note(start, end - start, octave, p, instrument, volume);
             notes.add(note);
             return this;
         }
 
         @Override
         public CompositionBuilder<GenericSong> addRepeat(int start, int end, int count) {
-            if(start % 4 != 0 || end % 4 != 0) {
-                throw new IllegalArgumentException("Repeats must start at the begining or ends of measures");
-            }
-            if(count <= 0) {
-                throw new IllegalArgumentException("Repeats must repeat at least once");
-            }
-            for(Repeat r : repeats) {
+            for (Repeat r : repeats) {
+                int s = r.getStart();
+                int e = r.getEnd();
+                boolean nestedOut = start < s && end > e;
+                boolean nestedIn = start > s && end < e;
+                boolean noConflictLeft = start < s && end < s;
+                boolean noConflictRight = start > e && end > e;
 
-                if(!(r.getStart() < start && r.getEnd() < end) ||
-                        !(r.getStart() < start && r.getEnd() < end)) {
+                if (!(nestedOut || nestedIn) && !(noConflictLeft || noConflictRight)) {
                     throw new IllegalArgumentException("That is an invalid repeat");
                 }
             }
@@ -62,14 +61,18 @@ public class GenericSong implements SongRep {
     private List<NoteRep> notes;
     private List<Repeat> repeats;
 
-    /** Public default constructor */
+    /**
+     * Public default constructor
+     */
     public GenericSong() {
         this.currentBeat = 0;
         this.notes = new ArrayList<>();
         this.repeats = new ArrayList<>();
     }
 
-    /** Constructor for a pre-made song */
+    /**
+     * Constructor for a pre-made song
+     */
     public GenericSong(List<NoteRep> notes, int tempo) {
         Objects.requireNonNull(notes);
         if (tempo < 0) {
@@ -118,7 +121,7 @@ public class GenericSong implements SongRep {
                 ok = false;
             }
         }
-        if(ok) {
+        if (ok) {
             notes.add(n);
         }
     }
@@ -199,22 +202,19 @@ public class GenericSong implements SongRep {
         if (set < 0) {
             throw new IllegalArgumentException("Current beat must be positive");
         }
+
         this.currentBeat = set;
-        for(Repeat r : repeats) {
-            if(r.getEnd() == currentBeat) {
-                if(r.getCount() > 0) {
+        repeats.stream().filter(r -> r.getEnd() == currentBeat).filter(r -> r.getCount() > 0).
+                forEach(r -> {
                     r.decreaseRepeats();
+                    resetRepeatsInside(r.getStart(), r.getEnd());
                     setCurrentBeat(r.getStart());
-                }
-            }
-        }
+                });
     }
 
     @Override
     public void resetRepeats() {
-        for (Repeat r : repeats) {
-            r.resetCount();
-        }
+        repeats.forEach(Repeat::resetCount);
     }
 
     @Override
@@ -257,28 +257,37 @@ public class GenericSong implements SongRep {
 
     @Override
     public void addRepeat(int start, int end, int count) {
-        System.out.println("adding repeat");
-        if(start % 4 != 0 || end % 4 != 0) {
-            throw new IllegalArgumentException("Repeats must start at the begining or ends of measures");
-        }
-        if(count <= 0) {
-            throw new IllegalArgumentException("Repeats must repeat at least once");
-        }
-        for(Repeat r : repeats) {
+        for (Repeat r : repeats) {
+            int s = r.getStart();
+            int e = r.getEnd();
+            boolean nestedOut = start < s && end > e;
+            boolean nestedIn = start > s && end < e;
+            boolean noConflictLeft = start < s && end < s;
+            boolean noConflictRight = start > e && end > e;
 
-            if(!(r.getStart() < start && r.getEnd() < end) ||
-                    !(r.getStart() < start && r.getEnd() < end)) {
+            if (!(nestedOut || nestedIn) && !(noConflictLeft || noConflictRight)) {
                 throw new IllegalArgumentException("That is an invalid repeat");
             }
         }
         repeats.add(new Repeat(start, end, count));
     }
 
+    @Override
+    public int getLength() {
+        int out = 0;
+
+        for (NoteRep n : notes) {
+            int end = n.getEnd();
+            out = end > out ? end : out;
+        }
+        return out;
+    }
+
     /**
      * Returns a string representation for any notes on the given line of the song.  If there are
      * more than one of the same note at the same time, only the first one will be shown.
      *
-     *  @return a String representation for any notes on the given line of the song
+     * @return a String representation for any notes on the given line of the song
      */
     private String printLine(int line, ArrayList<String> noteRange) {
         String out = String.format("%" + (Integer.toString(getLength()).length() + 1) +
@@ -305,7 +314,9 @@ public class GenericSong implements SongRep {
         return out;
     }
 
-    /** @return the lowest note in this song (as on a piano) */
+    /**
+     * @return the lowest note in this song (as on a piano)
+     */
     private NoteRep getLowestNote() {
         if (notes.isEmpty()) throw new IllegalArgumentException("There are no notes");
 
@@ -317,7 +328,9 @@ public class GenericSong implements SongRep {
         return lowestNote;
     }
 
-    /** @return the highest note in this song (as on a piano) */
+    /**
+     * @return the highest note in this song (as on a piano)
+     */
     private NoteRep getHighestNote() {
         if (notes.isEmpty()) throw new IllegalArgumentException("There are no notes");
 
@@ -329,14 +342,8 @@ public class GenericSong implements SongRep {
         return highestNote;
     }
 
-    @Override
-    public int getLength() {
-        int out = 0;
-
-        for (NoteRep n : notes) {
-            int end = n.getEnd();
-            out = end > out ? end : out;
-        }
-        return out;
+    private void resetRepeatsInside(int start, int end) {
+        repeats.stream().filter(r -> r.getStart() > start && r.getEnd() < end).
+                forEach(Repeat::resetCount);
     }
 }
