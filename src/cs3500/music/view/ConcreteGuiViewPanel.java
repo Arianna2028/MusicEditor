@@ -94,7 +94,7 @@ public class ConcreteGuiViewPanel extends JPanel {
      */
     private void paintTopLine(Graphics g) {
         g.setColor(Color.BLACK);
-        g.drawLine(X_INIT, NOTE_HEIGHT, ((songLength + (songLength % 4)) * BEAT_WIDTH) - 5,
+        g.drawLine(X_INIT, NOTE_HEIGHT, ((songLength + (songLength % 4)) * BEAT_WIDTH) + 5,
                 NOTE_HEIGHT);
     }
 
@@ -111,7 +111,7 @@ public class ConcreteGuiViewPanel extends JPanel {
             int y = count * NOTE_HEIGHT + NOTE_HEIGHT * 2;
             g.drawString(s, SIDE_WIDTH / 3, y - 5);
             // draw the lines for where the notes go
-            g.drawLine(X_INIT, y, ((songLength + (songLength % 4)) * BEAT_WIDTH) - 5, y);
+            g.drawLine(X_INIT, y, ((songLength + (songLength % 4)) * BEAT_WIDTH) + 5, y);
 
             count++;
         }
@@ -149,9 +149,9 @@ public class ConcreteGuiViewPanel extends JPanel {
         g.setColor(Color.BLACK);
         for (Repeat r : model.getAllRepeats()) {
             g.drawRect((6 + r.getStart() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4 * BEAT_WIDTH),
-                    NOTE_HEIGHT, 4, NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+                    NOTE_HEIGHT, 4, NOTE_HEIGHT * rangeOfNotes.size());
             g.drawRect((r.getEnd() * BEAT_WIDTH + 2 * BEAT_WIDTH) - (xWinStart * 4 * BEAT_WIDTH), NOTE_HEIGHT, 4,
-                    NOTE_HEIGHT + NOTE_HEIGHT * rangeOfNotes.size());
+                    NOTE_HEIGHT * rangeOfNotes.size());
         }
     }
 
